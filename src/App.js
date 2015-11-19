@@ -3,7 +3,14 @@ import React, { Component } from 'react';
 export default class App extends Component {
   render() {
     return (
-      <h1>Hello, world.</h1>
+      <div>Jamii World</div>
     );
   }
 }
+
+
+
+
+//<canvas width="500" height="300">
+//        HTML5 Canvas
+//      </canvas>
