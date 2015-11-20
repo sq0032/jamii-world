@@ -1,15 +1,48 @@
 import React, { Component } from 'react';
+import $ from 'jquery';
 import {Motion, spring} from 'react-motion';
 import MeetingRoom from './MeetingRoom';
+import MeetingRoomView from './MeetingRoomView';
 import Member from './Member';
 
 
 export default class JamiiWorld extends Component {
   constructor(props){
     super(props);
+    
     this.state = {
       member_position: {x:100, y:100},
+      is_in_meetingroom: false
     };
+  }
+  
+  componentDidMount(){
+    $(window)
+      .on('MOVE_TO_MEETINGROOM', {this:this}, this.on_moveToMeetingRoom)
+      .on('MOVE_TO_LOBBY', {this:this}, this.on_moveToLobby);
+    
+    //Initial file fetch (passing in root id)
+  }
+  componentWillUnmount(){
+    $(window)
+      .off('MOVE_TO_MEETINGROOM', this.on_moveToMeetingRoom)
+      .off('MOVE_TO_LOBBY', this.on_moveToLobby);
+  }
+  
+  on_moveToMeetingRoom(event) {
+    const that = event.data.this;
+    const pos = {
+      x: 50,
+      y: 50
+    };    
+    that.setState({
+      member_position: pos,
+      is_in_meetingroom:true
+    });
+  }
+  on_moveToLobby(event) {
+    const that = event.data.this;
+    that.setState({is_in_meetingroom:false});
   }
   
   moveTo(event) {
@@ -18,11 +51,17 @@ export default class JamiiWorld extends Component {
       x: event.clientX - dim.left,
       y: event.clientY - dim.top
     };
-    
-    this.setState({member_position: pos});
+    this.setState({
+      member_position: pos,
+      is_in_meetingroom: false
+    });
   }
   
   render() {
+    const meetingRoomView = this.state.is_in_meetingroom ? (<MeetingRoomView />) : null
+    
+    console.log(meetingRoomView);
+    
     return (
       <div style={style.JamiiWorld}>
         <svg 
@@ -35,6 +74,7 @@ export default class JamiiWorld extends Component {
             {pos => <Member pos={pos}/>}
           </Motion>
         </svg>
+          {meetingRoomView}
       </div>
     );
   }
